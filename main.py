@@ -8,4 +8,9 @@ cntrs = g.list_countries()
 
 @app.get("/")
 async def root():
-    return {"Countries": cntrs}
+  return {"Countries": cntrs}
+
+
+# @app.get("/plot")
+# async def plot():
+#   return {"data": }
