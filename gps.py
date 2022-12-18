@@ -3,8 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import shapely.geometry as sg
 import shapely.ops as so
-from typing import List, Optional
+from typing import List, Optional, Dict
 
+COLS = ["SOVEREIGNT", "TYPE", "ADMIN", "ADM0_A3", "GEOUNIT", "GU_A3", "SUBUNIT", 
+            "NAME", "NAME_LONG", "ABBREV", "POSTAL", "FORMAL_EN", "POP_EST", "GDP_MD","ECONOMY", 
+            "INCOME_GRP", "ISO_A2", "ISO_A3", "CONTINENT", "REGION_UN", "SUBREGION", "REGION_WB", "LABEL_X", "LABEL_Y", "NAME_EN", "geometry"]
 
 class GPS:
   def __init__(self, map_name: str) -> None:
@@ -12,12 +15,10 @@ class GPS:
 
     # other variables
     self.shapefile = None
-    self.meta = None
     self.fig_width = 16
     self.fig_height = 12
 
     self._read_file()
-    self._select_data()
 
 
   def _read_file(self) -> None:
@@ -64,22 +65,11 @@ class GPS:
     plt.show()
 
 
-  def _select_data(self) -> None:
-    """
-    Creates subset of data in pandas for filtering
-    """
-    cols = ["SOVEREIGNT", "TYPE", "ADMIN", "ADM0_A3", "GEOUNIT", "GU_A3", "SUBUNIT", 
-            "NAME", "NAME_LONG", "ABBREV", "POSTAL", "FORMAL_EN", "POP_EST", "GDP_MD","ECONOMY", 
-            "INCOME_GRP", "ISO_A2", "ISO_A3", "CONTINENT", "REGION_UN", "SUBREGION", "REGION_WB", "LABEL_X", "LABEL_Y", "NAME_EN", "geometry"]
-
-    self.meta = self.shapefile[cols]
-
-
   def _filter_data(self, attrb_name: str, attrb_values: List[str]) -> List[int]:
     """
     You can filter by column and list of values, returns list of indices. Will plot accordingly
     """
-    l = list(self.meta.loc[self.meta[attrb_name].isin(attrb_values)].index)
+    l = list(self.shapefile.loc[self.shapefile[attrb_name].isin(attrb_values)].index)
     return l
 
 
@@ -101,15 +91,15 @@ class GPS:
         print(f"Cant plot as list of indices for attrb_name: {attrb_name} and attrb_values: {attrb_values} is [{list_of_indices}]")
 
 
-  def select(self, attrb_name: Optional[str] = None, attrb_values: Optional[List[str]] = None) -> pd.DataFrame:
+  def select(self, attrb_name: Optional[str] = None, attrb_values: Optional[List[str]] = None) -> Dict:
     """
     Main data selection function
     """
     if (attrb_name is None) | (attrb_values is None):
-      return self.meta
+      return self.shapefile[COLS].to_dict(orient="records")
     else:
       list_of_indices = self._filter_data(attrb_name=attrb_name, attrb_values=attrb_values)
-      return self.shapefile.iloc[list_of_indices]
+      return self.shapefile[COLS].iloc[list_of_indices].to_dict(orient="records")
 
 
 
