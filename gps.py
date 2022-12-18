@@ -32,7 +32,7 @@ class GPS:
     Lists all countries in the file
     """
     l = list(self.shapefile["NAME"].values)
-    print(l)
+    # print(l)
     return l
 
   def plot(self) -> None:
@@ -72,6 +72,10 @@ class GPS:
             "INCOME_GRP", "ISO_A2", "ISO_A3", "CONTINENT", "REGION_UN", "SUBREGION", "REGION_WB", "LABEL_X", "LABEL_Y", "NAME_EN"]
 
     self.meta = self.shapefile[cols]
+
+
+  def filter_data(self, filter_name: str, filter_values: List[str]) -> List[int]:
+    pass
 
 
 
