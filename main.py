@@ -12,10 +12,11 @@ g = GPS(MAP_NAME)
 
 @app.post("/select")
 async def select(data: SelectData):
-  print(data.country)
+  # print(data.country)
   countries = data.country.split(";")
-  gj = g.select_geojson(attrb_name="NAME", attrb_values=countries)
+  gj = g.select_geojson(names=countries)
   return {"data": gj}
+
 
 app.add_middleware(CORSMiddleware,
                    allow_origins=["*"],

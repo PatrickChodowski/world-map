@@ -1,30 +1,11 @@
-from gps import GPS
-import shapely
+from gps import GPS, FILTER_COLS
 MAP_NAME = "ne_50m_admin_0_countries"
 g = GPS(MAP_NAME)
-import json
+import pandas as pd
 
-# g.plot("NAME", ["Poland", "Philippines", "United Arab Emirates"])
-# g.plot("CONTINENT", ["Africa"])
-# g.plot()
-
-# data = g.select("ADMIN", ["Italy"])
-# p = data[0]['geometry']
-# g._convert_polygon_data(p)
-
-# cntrs = ["Italy", "Poland"]
-c = "Poland"
-data = g.select("ADMIN", [c])
-data_df = g.select_df("ADMIN", [c])
-a = data[0]['geometry']
-a2 = data_df['geometry']
-
-ja = json.dumps(shapely.geometry.mapping(a))
-ja2 = json.dumps(shapely.geometry.mapping(a2))
-
-print(ja)
-
-print(ja2)
-# convert to geojson
-# ja = json.dumps(shapely.geometry.mapping(a))
-# print(ja)
+a = g.shapefile[FILTER_COLS].reset_index(drop=False)
+b = pd.melt(frame=a, id_vars="index")
+c = b.groupby(['value']).agg({'index': lambda x: list(set(x)), 'variable': lambda x: list(set(x))})
+d = c.to_dict(orient="index")
+print(d)
+print(d.keys())

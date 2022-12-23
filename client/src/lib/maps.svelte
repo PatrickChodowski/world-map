@@ -8,9 +8,9 @@
 
   export let country = "Poland";
   
-  let show_map = true;
   let map_data = "";
   let features = [];
+  let selected;
 
   const projection = geoMercator();
   const geo_generator = geoPath().projection(projection);
@@ -18,10 +18,8 @@
 
   async function post_data() {
 
-    if(country === ""){
-      show_map = false;
-    } else {
-      show_map = true;
+    if((country === "") || country === null){
+      features = [];
     }
 
     // show_spinner = true;
@@ -33,10 +31,13 @@
     if (res.status === 200){
       let resdata = await res.json();
       map_data = resdata.data;
-      features = map_data.features;
-      return map_data;
+      if (map_data !== null){
+        features = map_data.features;
+      } else {
+        features = [];
+      }
     } else {
-      return "";
+      features = [];
     }
   }
 
@@ -50,22 +51,31 @@
 </script>
 <input type="text" id="input-country" placeholder="Country" bind:value={country} on:change={() => post_data()}>
 
-{#if show_map}
   <svg viewBox="0 0 975 610">
     <g fill="white" stroke="black">
       {#each features as feature, i}
-        <!-- <path d={path(feature)} on:click={() => selected = feature} class="state" in:draw={{ delay: i * 50, duration: 1000 }} /> -->
-          <path d={geo_generator(feature)}></path>
+          <path d={geo_generator(feature)}  on:click={() => selected = feature} class="state"></path>
       {/each}
     </g>
   </svg>
-{/if}
 
+
+<div class="selectedName">{selected?.properties.name ?? ''}</div>
 
 <style>
 
   #input-country {
     width:500px;
   }
+
+  .state:hover {
+		fill: hsl(0 0% 50% / 20%);
+	}
+	
+	.selectedName {
+		text-align: center;
+		margin-top: 8px;
+		font-size: 1.5rem;
+	}
 
 </style>
