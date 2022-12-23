@@ -6,16 +6,16 @@
   import { onMount } from "svelte";
 
 
-  export let country = "Poland";
-  // const START_VALUE_X = 0;
-  // const START_VALUE_Y = 0;
+  export let country = "Europe";
+  const START_VALUE_X = 0;
+  const START_VALUE_Y = 0;
   // const START_VALUE_SCALE = 140;
   let map_data = "";
   let features = [];
   let selected;
 
-  // let translate_x = START_VALUE_X;
-  // let translate_y = START_VALUE_Y;
+  let translate_x = START_VALUE_X;
+  let translate_y = START_VALUE_Y;
   // let map_scale = START_VALUE_SCALE;
   let drag_click_x = 0;
   let drag_click_y = 0;
@@ -45,6 +45,7 @@
       map_data = resdata.data;
       if (map_data !== null){
         projection.fitSize([svg.width.baseVal.value, svg.height.baseVal.value], map_data);
+        console.log(map_data.bbox);
         features = map_data.features;
         on_drag = false;
         drag_click_x = 0;
@@ -59,33 +60,6 @@
 
 
   onMount(async function() {post_data()});
-
-
-	function move_map(e) {
-    let speed = 30;
-		 switch(e.keyCode) {
-			 case 38:
-          translate_y += speed;
-          e.preventDefault = true;  
-				 break;
-			 case 40:
-       translate_y -= speed;
-       e.preventDefault = true;  
-				 break;
-			 case 37:
-       translate_x += speed;
-       e.preventDefault = true;  
-				 break;
-			 case 39:
-       translate_x -= speed;
-       e.preventDefault = true;  
-				 break;
-		 }
-    //  console.log(e);
-
-    projection.translate([translate_x, translate_y]);
-    geo_generator = geoPath().projection(projection);
-	}
 
 
   function zoom_map(e){
@@ -131,18 +105,29 @@
 
   function pan_map_down(e){
     if(e.button  === 1){
+      // console.log(svg.children[0]);
+
+      // let svg_matrix = svg.getScreenCTM();
+      // console.log(svg_matrix);
+      // translate_x = svg_matrix.e;
+      // translate_y = svg_matrix.f;
+
       drag_click_x = e.clientX;
       drag_click_y = e.clientY;
       on_drag = true;
+      console.log("Clicked on: ", drag_click_x, drag_click_y);
     }
   }
 
   function pan_map_move(e){
     if(on_drag){
-      let diff_x = (e.clientX - drag_click_x)*1.3;
-      let diff_y = (e.clientY - drag_click_y)*1.3;
+      let diff_x = (e.clientX - drag_click_x);
+      let diff_y = (e.clientY - drag_click_y);
+
+      console.log("Diff is: ", diff_x, diff_y);
       drag_click_x = e.clientX;
       drag_click_y = e.clientY;
+      console.log()
       translate_x += diff_x;
       translate_y += diff_y;
       projection.translate([translate_x, translate_y]);
@@ -169,7 +154,7 @@
 
 
 </script>
-<!-- <svelte:window on:keydown={move_map} on:wheel|preventDefault={zoom_map} on:mousedown={pan_map_down} on:mouseup={pan_map_up} on:mousemove={pan_map_move}/> -->
+<svelte:window on:wheel|preventDefault={zoom_map} on:mousedown={pan_map_down} on:mouseup={pan_map_up} on:mousemove={pan_map_move}/>
 
 <input type="text" id="input-country" placeholder="Country" bind:value={country} on:change={() => post_data()}>
   <svg id="main-map" width="100%" height="100%" preserveAspectRatio=True bind:this={svg}>

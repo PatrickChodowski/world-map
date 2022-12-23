@@ -10,3 +10,7 @@ https://www.naturalearthdata.com/downloads/
 source ./venv/bin/activate
 uvicorn main:app --reload
 http://127.0.0.1:8000
+
+
+# will be useful...
+https://www.sitepoint.com/how-to-translate-from-dom-to-svg-coordinates-and-back-again/
