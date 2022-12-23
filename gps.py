@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import shapely.geometry as sg
 import shapely.ops as so
+import shapely
+import json
 from typing import List, Optional, Dict
 
 COLS = ["SOVEREIGNT", "TYPE", "ADMIN", "ADM0_A3", "GEOUNIT", "GU_A3", "SUBUNIT", 
@@ -96,12 +98,45 @@ class GPS:
     Main data selection function
     """
     if (attrb_name is None) | (attrb_values is None):
-      return self.shapefile[COLS].to_dict(orient="records")
+      d = self.shapefile[COLS].to_dict(orient="records")
     else:
       list_of_indices = self._filter_data(attrb_name=attrb_name, attrb_values=attrb_values)
-      return self.shapefile[COLS].iloc[list_of_indices].to_dict(orient="records")
+      d = self.shapefile[COLS].iloc[list_of_indices].to_dict(orient="records")
+
+    for record in d:
+      record['geojson'] = json.dumps(shapely.geometry.mapping(record['geometry']))
+    return d
 
 
+  def select_df(self, attrb_name: Optional[str] = None, attrb_values: Optional[List[str]] = None) -> pd.DataFrame:
+    """
+    Main data selection function
+    """
+    if (attrb_name is None) | (attrb_values is None):
+      d = self.shapefile[COLS]
+    else:
+      list_of_indices = self._filter_data(attrb_name=attrb_name, attrb_values=attrb_values)
+      d = self.shapefile[COLS].iloc[list_of_indices]
+
+    # for index, record in d.iterrows():
+    #   record['geojson'] = json.dumps(shapely.geometry.mapping(record['geometry']))
+
+    record['geojson'] = json.dumps(shapely.geometry.mapping(d['geometry']))
+    return d
+
+
+  def select_geojson(self, attrb_name: Optional[str] = None, attrb_values: Optional[List[str]] = None) -> Dict:
+    """
+    Main data selection function
+    """
+    if (attrb_name is None) | (attrb_values is None):
+      d = self.shapefile[COLS]
+    else:
+      list_of_indices = self._filter_data(attrb_name=attrb_name, attrb_values=attrb_values)
+      d = self.shapefile[COLS].iloc[list_of_indices]
+
+    geoj = json.loads(json.dumps(shapely.geometry.mapping(d['geometry'])))
+    return geoj
 
   # def copy_csv(self) -> None:
   #   self.shapefile.to_csv("temp.csv")
