@@ -2,19 +2,23 @@ from gps import GPS
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from utils import merge_gjons
 
 class SelectData(BaseModel):
   country: str
 
 app = FastAPI()
-MAP_NAME = "ne_50m_admin_0_countries"
-g = GPS(MAP_NAME)
+g_countries = GPS("ne_50m_admin_0_countries")
+g_cities = GPS("ne_50m_populated_places")
+gjons = list()
 
 @app.post("/select")
 async def select(data: SelectData):
-  # print(data.country)
   countries = data.country.split(";")
-  gj = g.select_geojson(names=countries)
+  gjons = list()
+  gjons.append(g_countries.select_geojson(names=countries))
+  gjons.append(g_cities.select_geojson(names=['Warsaw']))
+  gj = merge_gjons(gjons)
   return {"data": gj}
 
 

@@ -6,7 +6,7 @@
   import { onMount } from "svelte";
 
 
-  export let country = "Europe";
+  export let country = "Poland";
   const START_VALUE_X = 0;
   const START_VALUE_Y = 0;
   // const START_VALUE_SCALE = 140;
@@ -27,6 +27,15 @@
   let svg;
 
 
+  function get_mouse_position(e) {
+      var CTM = svg.getScreenCTM();
+      return {
+        x: (e.clientX - CTM.e) / CTM.a,
+        y: (e.clientY - CTM.f) / CTM.d
+      };
+    }
+
+
 
   async function post_data() {
 
@@ -45,8 +54,9 @@
       map_data = resdata.data;
       if (map_data !== null){
         projection.fitSize([svg.width.baseVal.value, svg.height.baseVal.value], map_data);
-        console.log(map_data.bbox);
+        // console.log(map_data.bbox);
         features = map_data.features;
+        // console.log(features);
         on_drag = false;
         drag_click_x = 0;
         drag_click_y = 0;
@@ -151,13 +161,18 @@
   }
 
 
+  function click_map(e) {
+    let coords = get_mouse_position(e);
+    console.log("Screen click:", e.clientX, e.clientY);
+    console.log("Map click:", coords);
+  }
 
 
 </script>
-<svelte:window on:wheel|preventDefault={zoom_map} on:mousedown={pan_map_down} on:mouseup={pan_map_up} on:mousemove={pan_map_move}/>
+<!-- <svelte:window on:wheel|preventDefault={zoom_map} on:mousedown={pan_map_down} on:mouseup={pan_map_up} on:mousemove={pan_map_move}/> -->
 
 <input type="text" id="input-country" placeholder="Country" bind:value={country} on:change={() => post_data()}>
-  <svg id="main-map" width="100%" height="100%" preserveAspectRatio=True bind:this={svg}>
+  <svg id="main-map" width="100%" height="100%" preserveAspectRatio=True bind:this={svg} on:click={click_map}>
     <g fill="white" stroke="black">
       {#each features as feature, i}
           <path d={geo_generator(feature)}  on:click={() => selected = feature} class="state"></path>

@@ -7,12 +7,8 @@ import shapely
 import json
 from typing import List, Optional, Dict
 import numpy as np
+from utils import COLS, FILTER_COLS
 
-COLS = ["SOVEREIGNT", "TYPE", "ADMIN", "ADM0_A3", "GEOUNIT", "GU_A3", "SUBUNIT", 
-            "NAME", "NAME_LONG", "ABBREV", "POSTAL", "FORMAL_EN", "POP_EST", "GDP_MD","ECONOMY", 
-            "INCOME_GRP", "ISO_A2", "ISO_A3", "CONTINENT", "REGION_UN", "SUBREGION", "REGION_WB", "LABEL_X", "LABEL_Y", "NAME_EN", "geometry"]
-
-FILTER_COLS = ["SOVEREIGNT", "TYPE", "ADMIN", "GEOUNIT", "SUBUNIT", "NAME", "NAME_LONG", "CONTINENT", "REGION_UN", "SUBREGION", "ISO_A3"]
 
 class GPS:
   def __init__(self, map_name: str) -> None:
@@ -25,8 +21,6 @@ class GPS:
 
     self._read_file()
     self._index = self._make_index()
-    # print(self._index)
-    # self.copy_csv()
 
   def _read_file(self) -> None:
     """
@@ -34,16 +28,6 @@ class GPS:
     """
     df = gpd.read_file(f"./data/{self.map_name}/{self.map_name}.shp")
     self.shapefile = df[~pd.isnull(df['geometry'])]
-
-
-  def list_countries(self) -> List[str]:
-    """
-    Lists all countries in the file
-    """
-    l = list(self.shapefile["NAME"].values)
-    # print(l)
-    return l
-
 
   def _plot_whole(self) -> None:
     """
@@ -93,47 +77,15 @@ class GPS:
         print(f"Cant plot as list of indices for names: {names} is [{list_of_indices}]")
 
 
-  # def select(self, attrb_name: Optional[str] = None, attrb_values: Optional[List[str]] = None) -> Dict:
-  #   """
-  #   Main data selection function
-  #   """
-  #   if (attrb_name is None) | (attrb_values is None):
-  #     d = self.shapefile[COLS].to_dict(orient="records")
-  #   else:
-  #     list_of_indices = self._filter_data(attrb_name=attrb_name, attrb_values=attrb_values)
-  #     d = self.shapefile[COLS].iloc[list_of_indices].to_dict(orient="records")
-
-  #   for record in d:
-  #     record['geojson'] = json.dumps(shapely.geometry.mapping(record['geometry']))
-  #   return d
-
-
-  # def select_df(self, attrb_name: Optional[str] = None, attrb_values: Optional[List[str]] = None) -> pd.DataFrame:
-  #   """
-  #   Main data selection function
-  #   """
-  #   if (attrb_name is None) | (attrb_values is None):
-  #     d = self.shapefile[COLS]
-  #   else:
-  #     list_of_indices = self._filter_data(attrb_name=attrb_name, attrb_values=attrb_values)
-  #     d = self.shapefile[COLS].iloc[list_of_indices]
-
-  #   # for index, record in d.iterrows():
-  #   #   record['geojson'] = json.dumps(shapely.geometry.mapping(record['geometry']))
-
-  #   record['geojson'] = json.dumps(shapely.geometry.mapping(d['geometry']))
-  #   return d
-
-
   def select_geojson(self, names: List[str]) -> Optional[Dict]:
     """
     Main data selection function
     """
     if (names is None):
-      d = self.shapefile[COLS]
+      d = self.shapefile[COLS[self.map_name]]
     else:
       list_of_indices = self._filter_data(names)
-      d = self.shapefile[COLS].iloc[list_of_indices]
+      d = self.shapefile[COLS[self.map_name]].iloc[list_of_indices]
 
     geoj = json.loads(json.dumps(shapely.geometry.mapping(d['geometry'])))
 
@@ -150,7 +102,7 @@ class GPS:
     """
     Creates the index after loading the shapefile data
     """
-    a = self.shapefile[FILTER_COLS].reset_index(drop=False)
+    a = self.shapefile[FILTER_COLS[self.map_name]].reset_index(drop=False)
     b = pd.melt(frame=a, id_vars="index")
     c = b.groupby(['value']).agg({'index': lambda x: list(set(x)), 'variable': lambda x: list(set(x))})
     d = c.to_dict(orient="index")
