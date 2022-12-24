@@ -10,6 +10,7 @@ class SelectData(BaseModel):
 app = FastAPI()
 g_countries = GPS("ne_50m_admin_0_countries")
 g_cities = GPS("ne_50m_populated_places")
+g_rivers = GPS("ne_50m_rivers_lake_centerlines_scale_rank")
 gjons = list()
 
 @app.post("/select")
@@ -18,6 +19,7 @@ async def select(data: SelectData):
   gjons = list()
   gjons.append(g_countries.select_geojson(names=countries))
   gjons.append(g_cities.select_geojson(names=['Warsaw']))
+  gjons.append(g_rivers.select_geojson(names=['Vistula']))
   gj = merge_gjons(gjons)
   return {"data": gj}
 
