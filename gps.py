@@ -92,6 +92,9 @@ class GPS:
     if np.isnan(geoj['bbox']).any():
       return None
     else:
+      for index, (_, row) in enumerate(d.iterrows()):
+        del row['geometry']
+        geoj['features'][index]['properties'] = row
       return geoj
 
   def copy_csv(self) -> None:

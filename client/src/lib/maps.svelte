@@ -54,9 +54,7 @@
       map_data = resdata.data;
       if (map_data !== null){
         projection.fitSize([svg.width.baseVal.value, svg.height.baseVal.value], map_data);
-        // console.log(map_data.bbox);
         features = map_data.features;
-        // console.log(features);
         on_drag = false;
         drag_click_x = 0;
         drag_click_y = 0;
@@ -172,13 +170,17 @@
 <!-- <svelte:window on:wheel|preventDefault={zoom_map} on:mousedown={pan_map_down} on:mouseup={pan_map_up} on:mousemove={pan_map_move}/> -->
 
 <input type="text" id="input-country" placeholder="Country" bind:value={country} on:change={() => post_data()}>
-  <svg id="main-map" width="100%" height="100%" preserveAspectRatio=True bind:this={svg} on:click={click_map}>
-    <g fill="white" stroke="black">
-      {#each features as feature, i}
-          <path d={geo_generator(feature)}  on:click={() => selected = feature} class="state"></path>
-      {/each}
-    </g>
-  </svg>
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<svg id="main-map" width="100%" height="100%" preserveAspectRatio=True bind:this={svg} on:click={click_map}>
+  <g fill="white" stroke="black">
+    {#each features as feature, i}
+        <path d={geo_generator(feature)} 
+              data-name = {feature.properties.NAME} 
+              on:click={() => selected = feature} class="state">
+        </path>
+    {/each}
+  </g>
+</svg>
 
 
 <div class="selectedName">{selected?.properties.name ?? ''}</div>

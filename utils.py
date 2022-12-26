@@ -26,12 +26,14 @@ def merge_gjons(gjons: List[Dict]) -> Dict:
   d['features'] = list()
   d['bbox'] = list()
 
-  for g in gjons:
-    # print(g)
-    if ((g['type'] == "FeatureCollection") & ('features' in g)  & ('bbox' in g)):
-      d['features'].extend(g['features'])
+  if gjons[0] is not None:
+    for g in gjons:
+      # print(g)
+      if g is not None:
+        if ((g['type'] == "FeatureCollection") & ('features' in g)  & ('bbox' in g)):
+          d['features'].extend(g['features'])
 
-  # too lazy to solve this right now
-  d['bbox']  = gjons[0]['bbox']
+    # too lazy to solve this right now
+    d['bbox']  = gjons[0]['bbox']
 
   return d

@@ -23,7 +23,6 @@ https://www.petercollingridge.co.uk/tutorials/svg/interactive/dragging/
 - make rivers non selectable
 - show cities based on the region selected
 - show rivers based on the region selected
-- pass additional data to frontend
 - make smarter bbox in merge_gjons
 - show cities above certain population/area
 - build whole setting panel and move it to different component
