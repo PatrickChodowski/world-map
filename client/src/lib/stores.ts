@@ -7,18 +7,24 @@ export const LOCAL_SERVER_URL: string = "http://127.0.0.1:8000"
 export const SERVER_URL: string = LOCAL_SERVER_URL;
 
 export let country: Writable<string> = writable("Poland");
+export let show_cities: Writable<boolean> = writable(true);
+export let show_rivers: Writable<boolean> = writable(true);
 export let features: Writable<Array<any>> = writable([]);
 export let projection = geoMercator();
 export let geo_generator = geoPath().projection(projection);
 export let svg_width = writable(2000);
 export let svg_height = writable(1000);
+export let highlighted_element_data: Writable<any> = writable({});
 
 // Gets map data from server. Is in stores as its used from maps and panel component
 export async function get_map_data() {
   const res = await fetch(`${SERVER_URL}/select`, 
                           {method:"POST", 
                           headers: {"Content-type": "application/json"}, 
-                          body: JSON.stringify({"country": get(country)})});
+                          body: JSON.stringify({"country": get(country),
+                                                "show_cities": get(show_cities),
+                                                "show_rivers": get(show_rivers),                     
+                        })});
 
   if (res.status === 200){
     let resdata = await res.json();

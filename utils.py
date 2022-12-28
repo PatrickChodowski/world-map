@@ -1,19 +1,19 @@
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 COLS = dict()
 COLS['ne_50m_admin_0_countries'] = ["SOVEREIGNT", "TYPE", "ADMIN", "ADM0_A3", "GEOUNIT", "GU_A3", "SUBUNIT", 
                                     "NAME", "NAME_LONG", "ABBREV", "POSTAL", "FORMAL_EN", "POP_EST", "GDP_MD","ECONOMY", 
                                     "INCOME_GRP", "ISO_A2", "ISO_A3", "CONTINENT", "REGION_UN", "SUBREGION", "REGION_WB", 
-                                    "LABEL_X", "LABEL_Y", "NAME_EN", "geometry"]
-COLS['ne_50m_populated_places'] = ['NAME', 'SOV0NAME','LATITUDE','LONGITUDE','NAME_EN', 'ADM0NAME' ,'geometry']
-COLS['ne_50m_rivers_lake_centerlines_scale_rank'] = ['name', 'name_en', 'label', 'geometry']
+                                    "LABEL_X", "LABEL_Y", "NAME_EN", "GEOMETRY"]
+COLS['ne_50m_populated_places'] = ['NAME', 'SOV0NAME','LATITUDE','LONGITUDE','NAME_EN', 'ADM0NAME' ,'GEOMETRY']
+COLS['ne_50m_rivers_lake_centerlines_scale_rank'] = ['NAME', 'NAME_EN', 'LABEL', 'GEOMETRY']
 
 
 FILTER_COLS = dict()
 FILTER_COLS['ne_50m_admin_0_countries'] = ["SOVEREIGNT", "TYPE", "ADMIN", "GEOUNIT", "SUBUNIT", "NAME", "NAME_LONG", "CONTINENT", "REGION_UN", "SUBREGION", "ISO_A3"]
-FILTER_COLS['ne_50m_populated_places'] = ['NAME_EN']
-FILTER_COLS['ne_50m_rivers_lake_centerlines_scale_rank'] = ['name','name_en','label']
+FILTER_COLS['ne_50m_populated_places'] = ['NAME_EN', 'SOV0NAME']
+FILTER_COLS['ne_50m_rivers_lake_centerlines_scale_rank'] = ['NAME', 'NAME_EN', 'LABEL']
 
 
 def merge_gjons(gjons: List[Dict]) -> Dict:
@@ -37,3 +37,11 @@ def merge_gjons(gjons: List[Dict]) -> Dict:
     d['bbox']  = gjons[0]['bbox']
 
   return d
+
+
+def extract_country_data(gc: Optional[Dict]) -> List:
+  list_of_countries = list()
+  if gc is not None:
+    for v in gc['features']:
+      list_of_countries.append(v['properties']['SOVEREIGNT'])
+  return list_of_countries

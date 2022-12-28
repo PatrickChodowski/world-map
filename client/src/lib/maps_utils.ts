@@ -9,13 +9,13 @@ let on_drag = false;
 let translate_x = START_VALUE_X;
 let translate_y = START_VALUE_Y;
 
-// function get_mouse_position(e) {
-  //     var CTM = svg.getScreenCTM();
-  //     return {
-  //       x: (e.clientX - CTM.e) / CTM.a,
-  //       y: (e.clientY - CTM.f) / CTM.d
-  //     };
-  //   }
+function get_mouse_position(e) {
+      var CTM = svg.getScreenCTM();
+      return {
+        x: (e.clientX - CTM.e) / CTM.a,
+        y: (e.clientY - CTM.f) / CTM.d
+      };
+    }
 
 
 

@@ -1,10 +1,9 @@
 
 
 <script>
-// @ts-nocheck
 
   import { onMount } from "svelte";
-  import { get_map_data, features, geo_generator, svg_height, svg_width } from './stores'
+  import { get_map_data, features, geo_generator, svg_height, svg_width, highlighted_element_data } from './stores'
 
   let selected = [];
   let svg;
@@ -16,11 +15,23 @@
 
   });
 
+  function get_mouse_position(e) {
+      var CTM = svg.getScreenCTM();
+      return {
+        x: (e.clientX - CTM.e) / CTM.a,
+        y: (e.clientY - CTM.f) / CTM.d
+      };
+    }
+
   function click_map(e) {
-    // let coords = get_mouse_position(e);
-    // console.log("Screen click:", e.clientX, e.clientY);
-    console.log("Map click");
-    
+    let coords = get_mouse_position(e);
+    // console.log("Screen click:", [e.clientX, e.clientY]);
+    // console.log("Map click:", [coords.x, coords.y]); 
+  }
+
+  function display_info(e){
+    // console.log("Name: ", e.target.getAttribute("data-name"));
+    highlighted_element_data.set({"name": e.target.getAttribute("data-name")});
   }
 
 </script>
@@ -31,8 +42,8 @@
     {#each $features as feature, i}
         <path d={geo_generator(feature)} 
               data-name = {feature.properties.NAME} 
-              on:click={() => selected = feature}
-              class="state">
+              class="state"
+              on:click={display_info}>
         </path>
     {/each}
   </g>
@@ -43,7 +54,7 @@
 
   #main-map {
     background-color: gray;
-    height:92vh;
+    height:90vh;
   }
 
   .state:hover {

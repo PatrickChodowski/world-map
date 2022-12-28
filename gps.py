@@ -27,7 +27,8 @@ class GPS:
     Reads shapefile data
     """
     df = gpd.read_file(f"./data/{self.map_name}/{self.map_name}.shp")
-    self.shapefile = df[~pd.isnull(df['geometry'])]
+    df.columns = df.columns.str.upper()
+    self.shapefile = df[~pd.isnull(df['GEOMETRY'])]
 
   def _plot_whole(self) -> None:
     """
@@ -41,7 +42,7 @@ class GPS:
     """
     Plots single polygon
     """
-    poly = self.shapefile['geometry'][index]
+    poly = self.shapefile['GEOMETRY'][index]
     p = gpd.GeoSeries(poly)
     p.plot(figsize=(self.fig_width, self.fig_height))
     plt.show()
@@ -87,13 +88,13 @@ class GPS:
       list_of_indices = self._filter_data(names)
       d = self.shapefile[COLS[self.map_name]].iloc[list_of_indices]
 
-    geoj = json.loads(json.dumps(shapely.geometry.mapping(d['geometry'])))
+    geoj = json.loads(json.dumps(shapely.geometry.mapping(d['GEOMETRY'])))
 
     if np.isnan(geoj['bbox']).any():
       return None
     else:
       for index, (_, row) in enumerate(d.iterrows()):
-        del row['geometry']
+        del row['GEOMETRY']
         geoj['features'][index]['properties'] = row
       return geoj
 
