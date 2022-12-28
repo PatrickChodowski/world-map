@@ -1,9 +1,7 @@
 <script lang="ts">
   import Maps from '../lib/maps.svelte';
-  import Example from '../lib/example.svelte'; 
-  let country: string; 
+  import Panel from '../lib/panel.svelte'; 
 </script>
 
-<Maps bind:country={country}/>
-
-<!-- <Example></Example> -->
+<Panel/>
+<Maps/>
