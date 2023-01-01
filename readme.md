@@ -24,4 +24,4 @@ https://www.petercollingridge.co.uk/tutorials/svg/interactive/dragging/
 - show cities above certain population/area
 - figure out proper zooming of svg elements
 - figure out proper translation of svg elements
-- for rivers and cities will need the list of countries and their coordinates to select correct rivers/cities
+- for rivers will need the list of countries and their coordinates to select correct rivers

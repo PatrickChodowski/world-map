@@ -82,21 +82,25 @@ class GPS:
     """
     Main data selection function
     """
-    if (names is None):
+    if (names is None) | (names.__len__() == 0) | (names == ['']):
+      d = None
+    elif names == ['world']:
       d = self.shapefile[COLS[self.map_name]]
     else:
       list_of_indices = self._filter_data(names)
       d = self.shapefile[COLS[self.map_name]].iloc[list_of_indices]
 
-    geoj = json.loads(json.dumps(shapely.geometry.mapping(d['GEOMETRY'])))
-
-    if np.isnan(geoj['bbox']).any():
-      return None
+    if d is not None:
+      geoj = json.loads(json.dumps(shapely.geometry.mapping(d['GEOMETRY'])))
+      if np.isnan(geoj['bbox']).any():
+        return None
+      else:
+        for index, (_, row) in enumerate(d.iterrows()):
+          del row['GEOMETRY']
+          geoj['features'][index]['properties'] = row
+        return geoj
     else:
-      for index, (_, row) in enumerate(d.iterrows()):
-        del row['GEOMETRY']
-        geoj['features'][index]['properties'] = row
-      return geoj
+      return None
 
   def copy_csv(self) -> None:
     self.shapefile.to_csv("./data/temp.csv")

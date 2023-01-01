@@ -2,7 +2,7 @@ from gps import GPS
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from utils import merge_gjons, extract_country_data
+from utils import merge_gjons, extract_props
 
 class SelectData(BaseModel):
   country: str
@@ -20,7 +20,7 @@ async def select(data: SelectData):
   countries = data.country.split(";")
   gjons = list()
   gjons.append(g_countries.select_geojson(names=countries))
-  list_of_countries = extract_country_data(gjons[0])
+  list_of_countries = extract_props(gjons[0], prop_name = 'SOVEREIGNT')
   if data.show_cities:
     gjons.append(g_cities.select_geojson(names=list_of_countries))
   if data.show_rivers:
