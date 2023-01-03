@@ -8,6 +8,7 @@ import json
 from typing import List, Optional, Dict
 import numpy as np
 from utils import COLS, FILTER_COLS
+from bbox_utils import BBOX
 
 
 class GPS:
@@ -22,6 +23,15 @@ class GPS:
     self._read_file()
     self._index = self._make_index()
 
+    # output of select_geojson
+    self.geoj = None
+
+  def __repr__(self) -> str:
+    return f"GPS({self.map_name})"
+
+  def __str__(self) -> str:
+    return f"GPS({self.map_name})"
+
   def _read_file(self) -> None:
     """
     Reads shapefile data
@@ -29,6 +39,7 @@ class GPS:
     df = gpd.read_file(f"./data/{self.map_name}/{self.map_name}.shp")
     df.columns = df.columns.str.upper()
     self.shapefile = df[~pd.isnull(df['GEOMETRY'])]
+
 
   def _plot_whole(self) -> None:
     """
@@ -93,14 +104,18 @@ class GPS:
     if d is not None:
       geoj = json.loads(json.dumps(shapely.geometry.mapping(d['GEOMETRY'])))
       if np.isnan(geoj['bbox']).any():
+        self.geoj = None
         return None
       else:
         for index, (_, row) in enumerate(d.iterrows()):
           del row['GEOMETRY']
           geoj['features'][index]['properties'] = row
+          self.geoj = geoj
         return geoj
     else:
+      self.geoj = None
       return None
+
 
   def copy_csv(self) -> None:
     self.shapefile.to_csv("./data/temp.csv")
@@ -115,3 +130,38 @@ class GPS:
     c = b.groupby(['value']).agg({'index': lambda x: list(set(x)), 'variable': lambda x: list(set(x))})
     d = c.to_dict(orient="index")
     return d
+
+
+  def extract_props(self, prop_name: str = 'SOVEREIGNT') -> List:
+    """
+    Extract list of properties from self.geoj
+    """
+    list_of_props = list()
+    if self.geoj is not None:
+      for v in self.geoj['features']:
+        if prop_name in v['properties']:
+          list_of_props.append(v['properties'][prop_name])
+    return list_of_props
+
+
+  def extract_bbox_list(self) -> List:
+    """
+    Extract list of bboxes (list) from self.geoj
+    """
+    list_of_bbox = list()
+    if self.geoj is not None:
+      for v in self.geoj['features']:
+        list_of_bbox.append(v['bbox'])
+    return list_of_bbox
+
+
+  def extract_bbox(self) -> BBOX:
+    """
+    Extract list of bboxes (BBOX) from self.geoj
+    """
+    list_of_bbox = self.extract_bbox_list()
+    l = list()
+    for bb in list_of_bbox:
+      l.append(BBOX(bb))
+    return l
+  
