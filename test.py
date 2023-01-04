@@ -35,3 +35,5 @@ for rb in rivers_bbox_dicts:
     res = compare_bbox(rb['river_bbox'], country_row['country_bbox'])
     if res in ['b1_inside']:
       print(f"River {rb['river_name']} belongs to {country_row['country_name']}")
+
+#sprawdz czemu wszystko sie mapuje do usa, rosji, francji

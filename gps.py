@@ -109,7 +109,7 @@ class GPS:
       else:
         for index, (_, row) in enumerate(d.iterrows()):
           del row['GEOMETRY']
-          geoj['features'][index]['properties'] = row
+          geoj['features'][index]['properties'] = row.to_dict()
           self.geoj = geoj
         return geoj
     else:
@@ -165,3 +165,28 @@ class GPS:
       l.append(BBOX(bb))
     return l
   
+
+  def extract_feature_by_props(self, prop_name:str, prop_value: any) -> List[Dict]:
+    """
+    Extract feature from geoj by its property
+    """
+    res_f = list()
+    for f in self.geoj['features']:
+      if prop_name in f['properties']:
+        if prop_value == f['properties'][prop_name]:
+          res_f.append(f)
+    return res_f
+
+  def extract_coords_from_feature(self, f: Dict) -> any:
+    geo_type = ""
+    coords0 = list()
+    if 'geometry' in f:
+      # Polygon; MultiPolygon; LineString
+      geo_type = f['geometry']['type']
+      coords0 = f['geometry']['coordinates']
+
+    # if geo_type  == "Polygon":
+    #   coords = coords0[0]
+
+
+
